@@ -78,13 +78,75 @@ mod num_traits {
 	impl_uint_num_traits!(U512, 8);
 }
 
+
+
+
 #[cfg(feature = "impl-serde")]
 mod serde {
 	use super::*;
-	use impl_serde::{impl_fixed_hash_serde, impl_uint_serde};
+	use impl_serde::{impl_fixed_hash_serde, impl_uint_serde, serde::{Serialize, Deserialize, Serializer, Deserializer, de::{Visitor, Error as DeError}}};
 
 	impl_uint_serde!(U128, 2);
-	impl_uint_serde!(U256, 4);
+
+	impl Serialize for U256 {
+		fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+		where
+			S: serde::Serializer,
+		{	
+			use std::io::Write;
+
+			// 64 + 2 bytes for 0x prefix
+			// let's allocate the string on stack
+			let mut buf = [0u8; 66];
+			write!(buf.as_mut(), "{}", self).map_err(impl_serde::serde::ser::Error::custom)?;
+
+			// let's convert it to a string
+			// we can use unsafe here because we know that the string is valid utf8
+			let s = unsafe { core::str::from_utf8_unchecked(&buf[..]) };
+
+			serializer.serialize_str(s)
+		}
+	}
+	
+	impl<'de> Deserialize<'de> for U256 {
+		fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+		where
+			D: Deserializer<'de>,
+		{
+			struct NiceSerializerVisitor;
+	
+			impl<'de> Visitor<'de> for NiceSerializerVisitor {
+				type Value = U256;
+	
+				fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+					formatter.write_str("Hex-string or dec string or number")
+				}
+	
+				fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+				where
+					E: DeError,
+				{
+					let value = if v.starts_with("0x") && v.len() > 2 {
+						U256::from_str_radix(&v[2..], 16).map_err(DeError::custom)?
+					} else {
+						U256::from_str_radix(v, 10).map_err(DeError::custom)?
+					};
+					Ok(value)
+				}
+	
+				fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
+				where
+					E: DeError,
+				{
+					U256::try_from(v).map_err(DeError::custom)
+				}
+			}
+	
+			deserializer.deserialize_any(NiceSerializerVisitor)
+		}
+	}
+	
+
 	impl_uint_serde!(U512, 8);
 
 	impl_fixed_hash_serde!(H128, 16);
