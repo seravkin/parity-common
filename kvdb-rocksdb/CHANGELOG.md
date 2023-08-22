@@ -4,6 +4,30 @@ The format is based on [Keep a Changelog].
 
 [Keep a Changelog]: http://keepachangelog.com/en/1.0.0/
 
+## [Unreleased]
+
+## [0.19.0] - 2023-05-10
+- Updated `rocksdb` to 0.21. [#750](https://github.com/paritytech/parity-common/pull/750)
+
+## [0.18.0] - 2023-04-21
+- Updated `rocksdb` to 0.20.1. [#743](https://github.com/paritytech/parity-common/pull/743)
+
+## [0.17.0] - 2022-11-29
+- Removed `parity-util-mem` support. [#696](https://github.com/paritytech/parity-common/pull/696)
+
+## [0.16.0] - 2022-09-20
+- Removed `owning_ref` from dependencies :tada:. [#662](https://github.com/paritytech/parity-common/pull/662)
+- No longer attempt to repair on `open`. [#667](https://github.com/paritytech/parity-common/pull/667)
+### Breaking
+- Updated `kvdb` to 0.12. [#662](https://github.com/paritytech/parity-common/pull/662)
+  - `add_column` and `remove_last_column` now require `&mut self`
+
+## [0.15.2] - 2022-03-20
+- Disable `jemalloc` feature for `rocksdb` where it is not working. [#633](https://github.com/paritytech/parity-common/pull/633)
+
+## [0.15.1] - 2022-02-18
+- Updated `rocksdb` to 0.18 and enable `jemalloc` feature. [#629](https://github.com/paritytech/parity-common/pull/629)
+
 ## [0.15.0] - 2022-02-04
 ### Breaking
 - Migrated to 2021 edition, enforcing MSRV of `1.56.1`. [#601](https://github.com/paritytech/parity-common/pull/601)

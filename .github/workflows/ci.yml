@@ -11,7 +11,7 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -19,7 +19,7 @@ jobs:
           override: true
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v1.3.0
+        uses: Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
 
       - uses: actions-rs/cargo@v1
         with:
@@ -35,7 +35,7 @@ jobs:
           - ubuntu-latest
           - macOS-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -43,7 +43,7 @@ jobs:
           override: true
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v1.3.0
+        uses: Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
 
       - run: rustup target add wasm32-unknown-unknown
 
@@ -98,6 +98,24 @@ jobs:
           command: test
           args: -p ethbloom --all-features
 
+      - name: Test bounded-collections no_std
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: -p bounded-collections --no-default-features
+
+      - name: Test bounded-collections no_std,serde
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: -p bounded-collections --no-default-features --features=serde
+
+      - name: Test bounded-collections all-features
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: -p bounded-collections --all-features
+
       - name: Test uint on bigendian
         if: runner.os == 'Linux'
         uses: actions-rs/cargo@v1
@@ -106,31 +124,11 @@ jobs:
           command: test
           args: -p uint --target=mips64-unknown-linux-gnuabi64
 
-      - name: Test parity-util-mem on Android
-        if: runner.os == 'Linux'
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: test
-          args: -p parity-util-mem --target=aarch64-linux-android
-
-      - name: Test parity-util-mem estimate-heapsize 
-        run: cargo test -p parity-util-mem --features='estimate-heapsize'
-
-      - name: Test parity-util-mem jemalloc-global 
-        run: cargo test -p parity-util-mem --features='jemalloc-global'
-
-      - name: Test parity-util-mem mimalloc-global 
-        run: cargo test -p parity-util-mem --features='mimalloc-global'
-
-      - name: Test parity-util-mem dlmalloc-global 
-        run: cargo test -p parity-util-mem --no-default-features --features='dlmalloc-global'
-
   test_windows:
     name: Test Windows
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -138,7 +136,7 @@ jobs:
           override: true
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v1.3.0
+        uses: Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
 
       - uses: actions-rs/cargo@v1
         with:
@@ -150,7 +148,7 @@ jobs:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
